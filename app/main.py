@@ -17,7 +17,7 @@ def students():
         "students": [
             "Rahul",
             "Priya",
-            "Arun"
+            "Amit",
         ]
     }
 
