@@ -1,18 +1,29 @@
 from fastapi import FastAPI
 
-app = FastAPI(title="CI/CD Demo")
+app = FastAPI(title="Student CI/CD Demo")
+
 
 @app.get("/")
 def home():
     return {
-        "message": "Hello Students hello docker cicd!",
-        "version": "1.0"
-        
+        "message": "Hello from FastAPI!",
+        "version": "v1"
     }
 
-@app.get("/about")
-def about():
+
+@app.get("/students")
+def students():
     return {
-        "project": "FastAPI CI/CD Demo",
-        "technology": "FastAPI + Docker + GitHub Actions"
+        "students": [
+            "Rahul",
+            "Priya",
+            "Arun"
+        ]
+    }
+
+
+@app.get("/health")
+def health():
+    return {
+        "status": "running"
     }
