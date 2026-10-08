@@ -1,11 +1,17 @@
-name: Build and Push Docker Image
+name: Build, Push and Deploy
 
 on:
   push:
     branches: [main]
+    paths:                      # only run when real source changes
+      - "app/**"
+      - "Dockerfile"
+      - "requirements.txt"
+      - "docker-compose.deploy.yml"
+      - ".github/workflows/**"
 
 jobs:
-  docker:
+  build:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Code
@@ -35,3 +41,27 @@ jobs:
           tags: |
             ${{ secrets.DOCKERHUB_USERNAME }}/fastapp:latest
             ${{ secrets.DOCKERHUB_USERNAME }}/fastapp:${{ github.sha }}
+
+  deploy:
+    needs: build                # runs only if build succeeded
+    runs-on: self-hosted        # your laptop / classroom machine
+    steps:
+      - name: Checkout Code (to get the compose file)
+        uses: actions/checkout@v4
+
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Pull and deploy with Docker Compose
+        shell: bash
+        env:
+          DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
+          IMAGE_TAG: ${{ github.sha }}
+        run: |
+          docker compose -f docker-compose.deploy.yml pull
+          docker compose -f docker-compose.deploy.yml up -d
+          docker compose -f docker-compose.deploy.yml ps
+          docker image prune -f
