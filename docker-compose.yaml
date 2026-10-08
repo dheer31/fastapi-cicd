@@ -1,16 +1,19 @@
 services:
   api:
+    # CI sets DOCKERHUB_USERNAME and IMAGE_TAG (the commit SHA), so this
+    # becomes e.g. yourname/fastapp:3f9c2ab... which the pipeline just pushed.
+    # Locally these are unset, so it falls back to local/fastapp:latest.
     image: ${DOCKERHUB_USERNAME:-local}/fastapp:${IMAGE_TAG:-latest}
-    build: .
+    build: .                      # used only for local `docker compose up --build`
     container_name: fastapi-cicd-demo
     ports:
       - "8000:8000"
     environment:
-      GIT_SHA: ${IMAGE_TAG:-unknown}
+      GIT_SHA: ${IMAGE_TAG:-unknown}   # shown by the /info endpoint
     restart: unless-stopped
     healthcheck:
       test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/health')"]
-      interval: 30s
+      interval: 10s               # was 30s; the workflow waits for "healthy"
       timeout: 5s
       retries: 3
       start_period: 10s

@@ -5,7 +5,7 @@ app = FastAPI(title="CI/CD Demo")
 @app.get("/")
 def home():
     return {
-        "message": "Hello Students hello docker hub!",
+        "message": "Hello Students hello docker cicd!",
         "version": "1.0"
         
     }
