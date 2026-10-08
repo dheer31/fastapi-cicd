@@ -5,8 +5,9 @@ app = FastAPI(title="CI/CD Demo")
 @app.get("/")
 def home():
     return {
-        "message": "Hello Students!",
+        "message": "Hello Students hello docker!",
         "version": "1.0"
+        
     }
 
 @app.get("/about")
